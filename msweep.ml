@@ -57,3 +57,14 @@ let seed_gen =
 ;;
 
 
+(* determines if a space (x,y) in a board (brd) is valid
+   also for neighbors *)
+
+let valid (x,y) brd = 
+    x>=0 && x<brd.cols && y>=0 && y<brd.rows
+;;
+
+let neighbor (x,y) brd = 
+    let neighborspace = [(x-1,y-1); (x-1,y); (x-1,y+1); (x,y-1); (x,y+1); (x+1,y-1); (x+1,y); (x+1,y+1)] in
+    List.filter (valid brd) neighborspace
+;;

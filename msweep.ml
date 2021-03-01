@@ -68,3 +68,25 @@ let neighbor (x,y) brd =
     let neighborspace = [(x-1,y-1); (x-1,y); (x-1,y+1); (x,y-1); (x,y+1); (x+1,y-1); (x+1,y); (x+1,y+1)] in
     List.filter (valid brd) neighborspace
 ;;
+
+let create_board brd = 
+   let create_space () = { mined=false; seen=false; flagged=false; neighbors=0 } in 
+   let copy_space b (x,y) = b.(x).(y) <- create_space() in
+   let set_mine_flag s n = s.(n / brd.rows).(n mod brd.rows).mined <- true in
+   let neighbor_mines b (x,y) =
+     let x = ref 0 in
+     let mine_count (x,y) = if b.(x).(y).mined then incr x 
+     in List.iter mine_count (neighbor brd (x,y)) ;
+        !x
+   in
+   let set_count b (x,y) =
+     if not b.(x).(y).mined 
+     then b.(x).(y).neighbors <- set_mine_flag b (x,y)
+   in
+   let list_mined = mine_list (brd.cols*brd.rows) brd.mines in 
+   let board = Array.make_matrix brd.cols brd.rows (create_space()) 
+   in iterate_spaces brd (copy_space board) ;
+      List.iter (set_mine_flag board) list_mined ;
+      iterate_spaces brd (set_count board) ;
+      board
+;;
